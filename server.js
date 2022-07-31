@@ -1,9 +1,14 @@
 const express = require('express'); // Used to create the server
+const app = express();
 const path = require('path'); // File locations
 const bodyParser = require('body-parser'); // Send and recieve data
 const knex = require('knex'); // Database access
+const bcrypt = require('bcryptjs'); // Encription for passwords
 const session = require('express-session');
+const { rejects } = require('assert');
+const knexSessionStore = require('connect-session-knex')(session);
 
+// Creates reference to database 
 const db = knex({
     client: 'pg',
     connection: {
@@ -14,69 +19,109 @@ const db = knex({
     }
 });
 
-const app = express();
+// Pre-emptively creates store to contain database connection info 
+const store = new knexSessionStore({
+    knex: db,
+    tablename: 'sessions', 
+    sidfieldname: 'sid',
+    createtable: true,
+});
 
+// Handels url pathing
 let initialPath = path.join(__dirname, "public");
 app.use(bodyParser.json());
 app.use(express.static(initialPath));
 
-app.use(session({
-    secret: 'key that will sign cookie',
-    resave: false,
-    saveUninitialized: false,
-}));
+// Creates session cookie
+app.use(
+    session({
+        secret: 'key that will sign cookie',
+        resave: false,
+        saveUninitialized: false,
+        store: store,
+    }
+));
 
-app.get("/", (req, res) => {
-    res.sendFile(path.join(initialPath, "main.html"));
+const isAuth = (req, res, next) => {
+    if(req.session.isAuth) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+}
+
+// =========== { Web Pages } =========== \\
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(initialPath, "./html/landingpage.html"));
 });
 
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(initialPath, "login.html"));
+    res.sendFile(path.join(initialPath, "./html/login.html"));
 });
 
 app.get('/signup', (req, res) => {
-    res.sendFile(path.join(initialPath, "signup.html"));
+    res.sendFile(path.join(initialPath, "./html/signup.html"));
 });
 
 app.get('/forgor', (req, res) => {
-    res.sendFile(path.join(initialPath, "forgor.html"));
+    res.sendFile(path.join(initialPath, "./html/forgor.html"));
 });
 
-app.post('/signup-user', (req, res) => {
-    const { username, password } = req.body;
+app.get('/dashboard', isAuth, (req, res) => {
+    res.sendFile(path.join(initialPath, "./html/dashboard.html"));
+});
 
+// =========== { Database referencing } =========== \\
+
+app.post('/signup-user', async (req, res) => {
+    const { username, password } = req.body;
     // Inserts data in the database
     if (!username.length || !password.length) {
         res.json("All fields must be filled");
     } else {
+        const hashedPsw = await bcrypt.hash(password, 12);
         db("users").insert({
             name: username,
-            password: password
+            password: hashedPsw
         }).returning("name").then(data =>{
             res.json(data[0]);
         }).catch(err => {
             if (err.detail.includes('already exists')) {
                 res.json('Username already exists');
             }
-        })
+        });
     }
 });
 
 app.post('/login-user', (req, res) => {
     const { username, password } = req.body;
+    
+    if (!username.length || !password.length) {
+        res.json("All fields must be filled");
+    } else {
+        db.select('password').from('users').where({ name:username, }).then(async data => {
 
-    db.select('name').from('users').where({
-        name:username,
-        password:password
-    }).then(data => {
-        if(data.length) {
-            res.json(data[0]);
-        } else {
-            res.json('Email or password is incorrect');
-        }
-    })
+            const isMatch = await bcrypt.compare(password, data[0].password);
+
+            if(isMatch && data.length) {
+                req.session.isAuth = true;
+                res.redirect('/dashboard');
+            } else {
+                res.json('Email or password is incorrect');
+            }
+        });
+    }
 });
 
+app.post('/logout-user', (req, res) => {
+    req.session.destroy((err => {
+        if(err) throw err;
+        res.redirect('/login');
+    }));
+});
+
+// Starts local server on port 3000
 app.listen(3000, (req, res) => {
     console.log('listening on port 3000');
 });

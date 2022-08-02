@@ -14,7 +14,18 @@ if (loginpagedetector) { // Login page
                 username: username.value,
                 password: password.value
             })
-        }).then(res => res.json()).then(data => { validateData(data); })
+        })
+        .then(res => {
+            if(res.status === 404) { throw 'no data'; }
+            return res.json()
+        })
+        .then(data => {
+            checkError(data);
+        })
+        //Login Succsessfull
+        .catch(() => { 
+            location.assign('/dashboard');
+        })
     })
 } else { // Signup page
     submitBtn.addEventListener('click', () => {
@@ -27,22 +38,22 @@ if (loginpagedetector) { // Login page
                 username: username.value,
                 password: password.value
             })
-        }).then(res => res.json()).then(data => { validateData(data); })
-    })
+        })
+        .then(res => res.json())
+        .then(data => {
+            checkError(data);
+        })
+        //Sign up success
+        .catch(() => {
+            location.assign('/login');
+        });
+    }) 
 }
 
-function validateData(data) {
-    if(!data.name) {
-        throwError(data);
-    } else {
-        // Should be cookies
-        sessionStorage.name = data.name;
-        location.href = '/';
+function checkError(data) {
+    if(data != 'Correct') { //Login Creds Incorrect
+        const error = document.getElementById('error');
+        error.innerHTML = data;
+        error.style.display = 'block';
     }
-}
-
-function throwError(data) {
-    const error = document.getElementById('error');
-    error.innerHTML = data;
-    error.style.display = 'block';
 }

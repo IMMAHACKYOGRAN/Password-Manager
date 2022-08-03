@@ -17,7 +17,7 @@
 body {
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
-    background-color: #e4e2f5;
+    background-color: var(--white);
     min-height: 100vh;
     display: flex;
     position: relative;
@@ -68,12 +68,6 @@ nav {
     font-weight: 600;
     font-size: 1.15rem;
     white-space: nowrap;
-}
-
-main {
-    flex: 1;
-    padding: 2rem;
-    color: var(--BackgroundColour);
 }
 
 .search {
@@ -219,4 +213,33 @@ body.shrink .hide {
     opacity: 0;
     pointer-events: none;
     transition-delay: 0s;
+}
+
+/* Pages */
+
+main {
+    flex: 1;
+    padding: 2rem;
+    color: var(--BackgroundColour);
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
+/* Password */
+.newpswd-btn {
+    width: 12rem; 
+    height: 50px;
+    border: 1px solid;
+    background: linear-gradient(90deg, var(--Accent1), var(--Accent2));
+    border-radius: 10px;
+    font-size: 18px;
+    color: var(--white);
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    margin: 1.5rem 0rem 1.5rem;
+    border: none;
 }

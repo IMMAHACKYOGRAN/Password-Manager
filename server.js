@@ -14,7 +14,7 @@ const db = knex({
     connection: {
         host: '127.0.0.1', // loopback address if online would be the server host ip
         user: 'postgres', // user that the database is stored on
-        password: 'Amiga109', // db password
+        password: 'test', // db password
         database: 'istlogins' // define what data base to parse to
     }
 });

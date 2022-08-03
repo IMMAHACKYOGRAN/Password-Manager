@@ -15,6 +15,7 @@
 }
 
 body {
+    z-index: 1;
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
     background-color: var(--white);
@@ -43,6 +44,7 @@ nav {
     transition: width 0.5s ease-in-out;
     display: flex;
     flex-direction: column;
+    z-index: 3;
 }
 
 .sidebar-top {
@@ -218,6 +220,7 @@ body.shrink .hide {
 /* Pages */
 
 main {
+    z-index: 1;
     flex: 1;
     padding: 2rem;
     color: var(--BackgroundColour);
@@ -242,4 +245,106 @@ main {
     outline: none;
     margin: 1.5rem 0rem 1.5rem;
     border: none;
+}
+
+table {
+    border-collapse: collapse;
+    width: auto;
+  }
+  
+td {
+    color: var(--header);
+    text-align: left;
+    padding: 16px;
+    border-bottom: 1px solid var(--header);
+}
+
+td a {
+    text-decoration: none;
+    color: var(--header);
+    transition: color 0.2s;
+}
+
+td a:hover {
+    text-decoration: underline;
+    color: var(--BackgroundColour);
+}
+
+th {
+    border-bottom: 1px solid var(--BackgroundColour);
+    font-size: 18px;
+    color: var(--BackgroundColour);
+    text-align: left;
+    padding: 16px;
+    padding-right: 64px;
+}
+
+.noshow-popup {
+    display: none;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #000;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    z-index: 2;
+}
+
+.popup-main {
+    z-index: 3;
+    color: var(--white);
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 400px;
+    background-color: var(--BackgroundColour);
+    border-radius: 10px;
+}
+
+.popup-main label {
+    position: relative;
+    top: 1rem;
+    color: var(--white);
+    font-size: 20px;
+    pointer-events: none;
+}
+
+.popup-main input {
+    position: relative;
+    text-align: center;
+    color: var(--header);
+    width: 100%;
+    top: 1rem;
+    padding: 0 5px;
+    height: 40px;
+    font-size: 16px;
+    border: none;
+    background: none;
+    outline: none;
+}
+
+.popup-main h2 {
+    text-align: center;
+    padding: 20px 0 20px 0;
+    border-bottom: 1px solid var(--header);
+}
+
+.popup-main button {
+    width: 5rem; 
+    height: 30px;
+    background: linear-gradient(90deg, var(--Accent1), var(--Accent2));
+    border-radius: 10px;
+    font-size: 16px;
+    color: var(--white);
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    margin: 1.5rem 0rem 1.5rem;
 }

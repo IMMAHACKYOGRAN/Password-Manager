@@ -1,3 +1,5 @@
+const userId = 0;
+
 const shrinkBtn = document.querySelector('#shrink-btn');
 const searchBtn = document.querySelector('.search');
 const sidebarLinks = document.querySelectorAll('.sidebar-links a');
@@ -11,7 +13,7 @@ function changeBg() {
     setPages(this.dataset.active);
 }
 
-shrinkBtn.addEventListener('click', () => { document.body.classList.toggle('shrink') }); 
+shrinkBtn.addEventListener('click',()=>{document.body.classList.toggle('shrink')}); 
 
 searchBtn.addEventListener('click', () => { 
     document.body.classList.remove('shrink');
@@ -21,7 +23,7 @@ searchBtn.addEventListener('click', () => {
 sidebarLinks.forEach(link => link.addEventListener('click', changeBg));
 
 logOutBtn.addEventListener('click', () => {
-    fetch('/logout-user', { method: 'post' }).then(location.assign('/login'));
+    fetch('/logout-user', {method:'post'}).then(location.assign('/login'));
 });
 
 // ---------{ Pages }--------- \\
@@ -33,8 +35,25 @@ function setPages(tabN) {
 }
 
 // ---------{ Password Pages }--------- \\
-const newpwdbtn = document.querySelector('.newpswd-btn');
+document.querySelector('.overlay').addEventListener('click', () => {
+    document.querySelector('.popup').classList.add('noshow-popup');
+});
 
-newpwdbtn.addEventListener('click', () => {
-    console.log('add pwd');
+document.querySelector('.newpswd-btn').addEventListener('click', () => {
+    document.querySelector('.popup').classList.toggle('noshow-popup')
+});
+
+document.querySelector('.save-entry').addEventListener('click', () => {
+    fetch('/add-password', {
+        method: 'post',
+        headers: new Headers({
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify({
+            id: userId,
+            url: document.querySelector('.url-input').value,
+            username: document.querySelector('.user-input').value,
+            password: document.querySelector('.pass-input').value
+        })
+    })
 });

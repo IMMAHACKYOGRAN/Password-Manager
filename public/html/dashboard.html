@@ -68,12 +68,37 @@
 
         <main class="show">
             <h1>Passwords</h1>
-                <ul>
-                    <button class="newpswd-btn">New Password</button>
-                    <li>
-                        <div class="item"></div>
-                    </li>
-                </ul>
+            <div class="popup noshow-popup">
+                <div class="popup-main">
+                    <h2>Add Password</h2>
+                    <label>Website Url:</label>
+                    <input type="text" class="url-input" placeholder="Url here" autocomplete="off" required>
+                    <label>Username:</label>
+                    <input type="text" class="user-input" placeholder="Username here" autocomplete="off" required>
+                    <label>Password:</label>
+                    <input type="text" class="pass-input" placeholder="Password here" autocomplete="off" required>
+                    <button class="save-entry">Save</button>
+                </div>
+                <div class="overlay"></div>
+            </div>
+            <div>
+                <button class="newpswd-btn">New Password</button>
+                <table>
+                    <tr>
+                        <th>Website</th>
+                        <th>Username</th>
+                        <th>Password</th>
+                        <th>Date Added</th>
+                    </tr>
+
+                    <!--Test-->
+                    <tr>
+                        <td><a href="">test.com</a></td>
+                        <td>Mr. Test</td>
+                        <td>test123</td>
+                        <td>01/01/2000</td>
+                    </tr>
+                </table>
             </div>
         </main>
 

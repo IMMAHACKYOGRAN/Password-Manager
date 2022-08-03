@@ -5,7 +5,7 @@ const bodyParser = require('body-parser'); // Send and recieve data
 const knex = require('knex'); // Database access
 const bcrypt = require('bcryptjs'); // Encription for passwords
 const session = require('express-session');
-const { rejects } = require('assert');
+//const { rejects } = require('assert');
 const knexSessionStore = require('connect-session-knex')(session);
 
 // Creates reference to database 
@@ -14,7 +14,7 @@ const db = knex({
     connection: {
         host: '127.0.0.1', // loopback address if online would be the server host ip
         user: 'postgres', // user that the database is stored on
-        password: 'test', // db password
+        password: 'Amiga109', // db password
         database: 'istlogins' // define what data base to parse to
     }
 });
@@ -119,6 +119,27 @@ app.post('/logout-user', (req, res) => {
         if(err) throw err;
         res.redirect('/login');
     }));
+});
+
+app.post('/add-password', (req, res) => {
+    const { id, url, username, password } = req.body;
+
+    if (!username.length || !password.length && !url.length) {
+        res.json("All fields must be filled");
+    } else {
+        db("userdata").insert({
+            id: id, 
+            url: url,
+            username: username,
+            password: password
+        }).returning("name").then(data =>{
+            res.json(data[0]);
+        }).catch(err => {
+            if (err.detail.includes('already exists')) {
+                res.json('Username already exists');
+            }
+        });
+    }
 });
 
 // Starts local server on port 3000

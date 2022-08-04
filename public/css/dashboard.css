@@ -348,3 +348,12 @@ th {
     border: none;
     margin: 1.5rem 0rem 1.5rem;
 }
+
+.error-div {
+    margin: 0 30px 30px 30px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    color: #ff0000;
+    display: none;
+}

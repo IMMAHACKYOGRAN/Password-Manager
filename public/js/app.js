@@ -1,10 +1,17 @@
-const userId = 0;
+let userId;
+fetch('/get-id', {method:'get'}).then(res => res.json()).then(data => {
+    userId = data;
+    updatePsws(data);
+}).catch(() => {
+    console.log('error');
+});
 
 const shrinkBtn = document.querySelector('#shrink-btn');
 const searchBtn = document.querySelector('.search');
 const sidebarLinks = document.querySelectorAll('.sidebar-links a');
 const activeBox = document.querySelector('.active-tab');
 const logOutBtn = document.querySelector('.log-out');
+const passwordTable = document.querySelector('#password-table');
 
 function changeBg() {
     sidebarLinks.forEach(link => link.classList.remove('active'));
@@ -55,5 +62,35 @@ document.querySelector('.save-entry').addEventListener('click', () => {
             username: document.querySelector('.user-input').value,
             password: document.querySelector('.pass-input').value
         })
+    }).then(res => res.json()).then(data => {      
+        if(typeof data === 'string') {
+            let error = document.querySelector('.error-div');
+            error.innerHTML = data;
+            error.style.display = 'block';
+        } else {
+            updatePsws(data);
+            document.querySelector('.popup').classList.add('noshow-popup');
+        }
     })
 });
+
+function updatePsws(d) {
+    if(d === userId) {
+        fetch('/get-pwds', {method:'get'}).then(res => res.json()).then(data => {
+            for(i = 0; i < data.length; i++) {
+                setRow(passwordTable.insertRow(), data[i]);
+            }
+        });
+    } else {
+        fetch('/get-pwds', {method:'get'}).then(res => res.json()).then(data => {
+            setRow(passwordTable.insertRow(), data[data.length - 1]);
+        });
+    }
+}
+
+function setRow(row, data) {
+    row.insertCell(0).innerHTML = data.website;
+    row.insertCell(1).innerHTML = data.username;
+    row.insertCell(2).innerHTML = data.password;
+    row.insertCell(3).innerHTML = data.date;
+}

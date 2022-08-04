@@ -84,8 +84,8 @@ app.post('/signup-user', async (req, res) => {
         db("users").insert({
             name: username,
             password: hashedPsw
-        }).returning("name").then(data =>{
-            res.json(data[0]);
+        }).returning("name").then(() => {
+            res.redirect('/login');
         }).catch(err => {
             if (err.detail.includes('already exists')) {
                 res.json('Username already exists');
@@ -100,15 +100,15 @@ app.post('/login-user', (req, res) => {
     if (!username.length || !password.length) {
         res.json("All fields must be filled");
     } else {
-        db.select('password').from('users').where({ name:username, }).then(async data => {
-
+        db.select('password', 'id').from('users').where({ name:username, }).then(async data => {
             const isMatch = await bcrypt.compare(password, data[0].password);
 
             if(isMatch && data.length) {
                 req.session.isAuth = true;
+                req.session.userId = data[0].id;
                 res.redirect('/dashboard');
             } else {
-                res.json('Email or password is incorrect');
+                res.json('Username or password is incorrect');
             }
         });
     }
@@ -124,22 +124,34 @@ app.post('/logout-user', (req, res) => {
 app.post('/add-password', (req, res) => {
     const { id, url, username, password } = req.body;
 
-    if (!username.length || !password.length && !url.length) {
+    if (!username.length || !password.length || !url.length) {
         res.json("All fields must be filled");
     } else {
         db("userdata").insert({
-            id: id, 
-            url: url,
+            id: id,
+            website: url,
             username: username,
             password: password
-        }).returning("name").then(data =>{
+        }).returning('*').then(data =>{
             res.json(data[0]);
         }).catch(err => {
             if (err.detail.includes('already exists')) {
-                res.json('Username already exists');
+                res.json('Website already has password saved');
             }
         });
     }
+});
+
+app.get('/get-pwds', (req, res) => {
+    db.select('*').from('userdata').where({id: req.session.userId}).then(data => {
+        return res.json(data);
+    });
+})
+
+app.get('/get-id', (req, res) => {
+    if(!req.session.userId) {return res.redirect('/login')}
+
+    return res.json(req.session.userId);
 });
 
 // Starts local server on port 3000
@@ -151,11 +163,20 @@ app.listen(3000, (req, res) => {
 
 
 
-
-//------Bibliography------
-//https://www.youtube.com/watch?v=lkDrG7G77Fg
-//https://www.npmjs.com/package/connect-pg-simple
-//https://www.youtube.com/watch?v=TDe7DRYK8vU
-//https://www.youtube.com/watch?v=I3ZNqmPBOPQ
-//https://www.youtube.com/watch?v=RAFZleZYxsc
-//https://www.youtube.com/watch?v=0EBkVzIBnoc
+/*------Bibliography------
+https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Traversing_an_HTML_table_with_JavaScript_and_DOM_Interfaces
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof#typeof_null
+https://www.w3schools.com/sql/sql_delete.asp
+https://www.youtube.com/watch?v=lkDrG7G77Fg
+https://www.npmjs.com/package/connect-pg-simple
+https://www.youtube.com/watch?v=TDe7DRYK8vU
+https://www.youtube.com/watch?v=I3ZNqmPBOPQ
+https://www.youtube.com/watch?v=RAFZleZYxsc
+https://www.youtube.com/watch?v=0EBkVzIBnoc
+https://dba.stackexchange.com/questions/215604/how-to-select-multiple-item-from-database
+https://www.tabnine.com/code/javascript/functions/express-session/Session/userId
+https://www.tabnine.com/code/javascript/functions/express/Request/user
+https://www.tabnine.com/code/javascript/query/%22session%22
+https://www.tabnine.com/code/javascript/functions/express-session/Session/user
+https://www.w3schools.com/jsref/dom_obj_table.asp
+*/
